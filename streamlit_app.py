@@ -102,6 +102,14 @@ def download_report(df):
     df.to_csv(buf, index=False)
     return buf.getvalue()
 
+def generate_template():
+    cols = ["timestamp", "weight_kg", "body_fat_percent", "bmi", "muscle_mass_kg",
+            "visceral_fat", "bone_mass_kg", "water_percent", "bmr_kcal"]
+    example = pd.DataFrame({col: ["2025-06-01"] if col == "timestamp" else [None] for col in cols})
+    csv = io.StringIO()
+    example.to_csv(csv, index=False)
+    return csv.getvalue()
+
 # --- Streamlit App Layout ---
 
 def main():
@@ -112,6 +120,10 @@ def main():
     timezone = st.sidebar.text_input("Timezone", "Australia/Adelaide")
     goal_weight = st.sidebar.number_input("Target Weight (kg)", min_value=30.0, max_value=200.0, value=75.0)
     goal_bfp = st.sidebar.number_input("Target Body Fat %", min_value=5.0, max_value=50.0, value=15.0)
+
+    st.markdown("Download a sample template to get started:")
+    template_csv = generate_template()
+    st.download_button("Download CSV Template", template_csv, file_name="body_composition_template.csv", mime="text/csv")
 
     files = st.file_uploader("Upload data files", type=['csv','xlsx','xls','json'], accept_multiple_files=True)
 
